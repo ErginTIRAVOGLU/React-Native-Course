@@ -3,11 +3,12 @@ import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{
+    <Tabs  screenOptions={{
       headerStyle: { backgroundColor: "cornflowerblue" },
       headerTintColor: "white",
       headerTitleStyle: { fontWeight: "bold", color: "white"},
-      tabBarActiveTintColor:"crimson"    
+      tabBarActiveTintColor:"crimson",
+      headerShown: false
     }}>
       <Tabs.Screen
         name="index"
@@ -17,14 +18,7 @@ export default function TabsLayout() {
             <Ionicons name={focused ? "home" : "home-outline"} color={color} size={size} />
           ),
         }} />
-      <Tabs.Screen
-        name="about"
-        options={{
-          headerTitle: "About",
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? "information-circle" : "information-circle-outline"} color={color} size={size} />
-          ),
-        }} />
+     
       <Tabs.Screen
         name="profile"
         options={{

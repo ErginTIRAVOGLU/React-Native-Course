@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export interface User {
     id: string;
@@ -22,6 +22,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        checkSession();
+    }, []);
+
+    const checkSession = async () => {
+        try {
+
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session?.user) {
+                const userProfile = await fetchUserProfile(session.user.id);
+                setUser(userProfile);
+                setIsLoading(false);
+            }
+            else {
+                setUser(null);
+                setIsLoading(false);
+            }
+
+        } catch (error) {
+            console.error("Error checking session:", error);
+            setUser(null);
+            setIsLoading(false);
+        }
+    };
 
     const fetchUserProfile = async (userId: string): Promise<User | null> => {
         try {
@@ -39,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             return {
                 id: data.id,
                 name: data.name,
-                email: "", // auth'tan alacağız
+                email: data.email, // auth'tan alacağız
                 username: data.username,
                 profileImage: data.profile_image_url,
                 onboardingCompleted: data.onboarding_completed,
@@ -54,8 +81,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
     const signIn = async (email: string, password: string) => {
-        // Implement sign-in logic using Supabase client
-        // On successful sign-in, set the user state
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+        if (error) { throw error; }
+
+
+        if (data.user) {
+            console.log("User signed up:", data.user);
+            const userProfile = await fetchUserProfile(data.user.id);
+            setUser(userProfile);
+        }
     };
 
     const signUp = async (email: string, password: string) => {
@@ -64,13 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             password
         });
         if (error) { throw error; }
-
-        const { data: sessionData } = await supabase.auth.getSession();
-
-        if (!sessionData.session) {
-            console.log("No active session yet.");
-            return;
-        }
 
         if (data.user) {
             console.log("User signed up:", data.user);
