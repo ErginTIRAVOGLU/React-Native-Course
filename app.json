@@ -8,7 +8,10 @@
     "scheme": "reactnativecourse",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription":"We need access to your library so you can choose photos to upload."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +21,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.ReactNativeCourse"
+      "package": "com.anonymous.ReactNativeCourse",
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ]
     },
     "web": {
       "output": "static",
